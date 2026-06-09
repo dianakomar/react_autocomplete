@@ -13,7 +13,10 @@ export const Autocomplete: React.FC<Props> = ({ delay = 300, onSelected }) => {
   const [appliedQuery, setAppliedQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
-  const applyQuery = useCallback(debounce(setAppliedQuery, 300), [delay]);
+  const applyQuery = useCallback(
+    debounce((value: string) => setAppliedQuery(value), delay),
+    [delay],
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -23,9 +26,13 @@ export const Autocomplete: React.FC<Props> = ({ delay = 300, onSelected }) => {
     onSelected(null);
   };
 
-  const filteredPeople = peopleFromServer.filter(person =>
-    person.name.toLowerCase().includes(appliedQuery.toLowerCase()),
-  );
+  let filteredPeople = peopleFromServer;
+
+  if (appliedQuery.trim() !== '') {
+    filteredPeople = peopleFromServer.filter(person =>
+      person.name.toLowerCase().includes(appliedQuery.toLowerCase()),
+    );
+  }
 
   return (
     <div className={`dropdown ${isOpen ? 'is-active' : ''}`}>
